@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        background: transparent;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .widget {
+        width: 100%;
+        max-width: 700px;
+        background: #151515;
+        border-radius: 8px;
+        padding: 16px 18px;
+        color: white;
+    }
+
+    .row {
+        display: grid;
+        grid-template-columns: 70px 1fr 75px;
+        align-items: center;
+        gap: 12px;
+        margin: 10px 0;
+    }
+
+    .label {
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .bar {
+        height: 22px;
+        border: 3px solid white;
+        border-radius: 5px;
+        overflow: hidden;
+        background: #151515;
+    }
+
+    .fill {
+        height: 100%;
+        background: #eeeeee;
+        transition: width 0.5s ease;
+    }
+
+    .value {
+        font-size: 14px;
+        white-space: nowrap;
+        text-align: left;
+    }
+
+    @media (max-width: 500px) {
+        .row {
+            grid-template-columns: 55px 1fr 65px;
+            gap: 8px;
+        }
+
+        .label,
+        .value {
+            font-size: 12px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="widget">
+
+    <div class="row">
+        <div class="label">YEAR</div>
+        <div class="bar">
+            <div class="fill" id="yearBar"></div>
+        </div>
+        <div class="value" id="yearValue"></div>
+    </div>
+
+    <div class="row">
+        <div class="label">MONTH</div>
+        <div class="bar">
+            <div class="fill" id="monthBar"></div>
+        </div>
+        <div class="value" id="monthValue"></div>
+    </div>
+
+    <div class="row">
+        <div class="label">WEEK</div>
+        <div class="bar">
+            <div class="fill" id="weekBar"></div>
+        </div>
+        <div class="value" id="weekValue"></div>
+    </div>
+
+    <div class="row">
+        <div class="label">DAY</div>
+        <div class="bar">
+            <div class="fill" id="dayBar"></div>
+        </div>
+        <div class="value" id="dayValue"></div>
+    </div>
+
+</div>
+
+<script>
+
+function updateWidget() {
+
+    const now = new Date();
+
+    /* YEAR */
+    const year = now.getFullYear();
+    const startYear = new Date(year, 0, 1);
+    const endYear = new Date(year + 1, 0, 1);
+
+    const yearProgress =
+        (now - startYear) /
+        (endYear - startYear);
+
+    document.getElementById("yearBar").style.width =
+        (yearProgress * 100) + "%";
+
+    document.getElementById("yearValue").textContent =
+        "1 / 1";
+
+
+    /* MONTH */
+    const month = now.getMonth() + 1;
+
+    document.getElementById("monthBar").style.width =
+        (month / 12 * 100) + "%";
+
+    document.getElementById("monthValue").textContent =
+        month + " / 12";
+
+
+    /* WEEK */
+    const dayOfYear =
+        Math.floor(
+            (now - startYear) /
+            (1000 * 60 * 60 * 24)
+        ) + 1;
+
+    const weekOfYear =
+        Math.ceil(dayOfYear / 7);
+
+    const totalWeeks =
+        Math.ceil(
+            (endYear - startYear) /
+            (1000 * 60 * 60 * 24 * 7)
+        );
+
+    document.getElementById("weekBar").style.width =
+        (weekOfYear / totalWeeks * 100) + "%";
+
+    document.getElementById("weekValue").textContent =
+        weekOfYear + " / " + totalWeeks;
+
+
+    /* DAY */
+    const day = now.getDate();
+
+    const daysInMonth =
+        new Date(
+            now.getFullYear(),
+            now.getMonth() + 1,
+            0
+        ).getDate();
+
+    document.getElementById("dayBar").style.width =
+        (day / daysInMonth * 100) + "%";
+
+    document.getElementById("dayValue").textContent =
+        day + " / " + daysInMonth;
+}
+
+updateWidget();
+
+setInterval(updateWidget, 60000);
+
+</script>
+
+</body>
+</html>
