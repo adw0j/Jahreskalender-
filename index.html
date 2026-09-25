@@ -54,7 +54,6 @@
     .value {
         font-size: 14px;
         white-space: nowrap;
-        text-align: left;
     }
 
     @media (max-width: 500px) {
@@ -115,23 +114,39 @@ function updateWidget() {
 
     const now = new Date();
 
-    /* YEAR */
-    const year = now.getFullYear();
-    const startYear = new Date(year, 0, 1);
-    const endYear = new Date(year + 1, 0, 1);
+    /* =========================
+       YEAR
+       ========================= */
 
-    const yearProgress =
-        (now - startYear) /
-        (endYear - startYear);
+    const year = now.getFullYear();
+
+    const startYear = new Date(year, 0, 1);
+    const startNextYear = new Date(year + 1, 0, 1);
+
+    const millisecondsPerDay = 1000 * 60 * 60 * 24;
+
+    const dayOfYear =
+        Math.floor(
+            (now - startYear) / millisecondsPerDay
+        ) + 1;
+
+    const daysInYear =
+        Math.round(
+            (startNextYear - startYear) /
+            millisecondsPerDay
+        );
 
     document.getElementById("yearBar").style.width =
-        (yearProgress * 100) + "%";
+        (dayOfYear / daysInYear * 100) + "%";
 
     document.getElementById("yearValue").textContent =
-        "1 / 1";
+        dayOfYear + " / " + daysInYear;
 
 
-    /* MONTH */
+    /* =========================
+       MONTH
+       ========================= */
+
     const month = now.getMonth() + 1;
 
     document.getElementById("monthBar").style.width =
@@ -141,35 +156,46 @@ function updateWidget() {
         month + " / 12";
 
 
-    /* WEEK */
-    const dayOfYear =
-        Math.floor(
-            (now - startYear) /
-            (1000 * 60 * 60 * 24)
-        ) + 1;
+    /* =========================
+       WEEK
+       ========================= */
 
-    const weekOfYear =
-        Math.ceil(dayOfYear / 7);
+    const day = now.getDate();
 
-    const totalWeeks =
-        Math.ceil(
-            (endYear - startYear) /
-            (1000 * 60 * 60 * 24 * 7)
+    /*
+       Woche innerhalb des Monats.
+
+       1–7   = Woche 1
+       8–14  = Woche 2
+       15–21 = Woche 3
+       22–31 = Woche 4
+
+       Dadurch bleibt die Anzeige
+       maximal bei 4 / 4.
+    */
+
+    const weekOfMonth =
+        Math.min(
+            4,
+            Math.ceil(day / 7)
         );
 
+    const totalWeeksInMonth = 4;
+
     document.getElementById("weekBar").style.width =
-        (weekOfYear / totalWeeks * 100) + "%";
+        (weekOfMonth / totalWeeksInMonth * 100) + "%";
 
     document.getElementById("weekValue").textContent =
-        weekOfYear + " / " + totalWeeks;
+        weekOfMonth + " / " + totalWeeksInMonth;
 
 
-    /* DAY */
-    const day = now.getDate();
+    /* =========================
+       DAY
+       ========================= */
 
     const daysInMonth =
         new Date(
-            now.getFullYear(),
+            year,
             now.getMonth() + 1,
             0
         ).getDate();
@@ -183,6 +209,7 @@ function updateWidget() {
 
 updateWidget();
 
+/* Aktualisierung jede Minute */
 setInterval(updateWidget, 60000);
 
 </script>
